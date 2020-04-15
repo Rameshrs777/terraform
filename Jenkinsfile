@@ -17,22 +17,26 @@ pipeline {
                 sh 'sudo rm -r *;sudo git clone https://github.com/Rameshrs777/terraform.git'
             }
         }
-        stage('terraform init') {
-            steps {
-                sh 'sudo /ec2-user/terraform init ./jenkins'
-            }
-        }
-        stage('terraform plan') {
-            steps {
-                sh 'ls ./jenkins; sudo /ec2-user/terraform plan ./jenkins'
-            }
-        }
-        stage('terraform ended') {
-            steps {
-                sh 'echo "Ended....!!"'
-            }
-        }
-
-        
     }
-}
+       stage(‘Set Terraform path’) {
+           steps {
+               script {
+                   def tfHome = tool name: ‘Terraform’
+                   env.PATH = “${tfHome}:${env.PATH}”
+                       }
+               sh ‘terraform — version’ 
+                 }
+             }
+ 
+      stage(‘Provision infrastructure’) {
+          steps {
+            dir(‘dev’)
+                  {
+            sh ‘terraform init’
+            sh ‘terraform plan -out=plan’
+ // sh ‘terraform destroy -auto-approve’
+ sh ‘terraform apply plan’
+            }
+        }
+     }
+ }
