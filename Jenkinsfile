@@ -1,8 +1,8 @@
  pipeline {
-   agent any
-   environment {
-       terraform_version = '0.12.24'
-       
+     agent 
+         node {
+              label 'master'
+         } 
    }
    stages {
        stage('terrform version') {
@@ -11,23 +11,19 @@
                sh 'terraform -v'
            }
        }
-       stage('checkout repo') {
+       stage('git clone') {
            steps {
-               git branch: "master",
-               
-               url: 'https://github.com/Rameshrs777/terraform.git'
+               sh git clone 'https://github.com/Rameshrs777/terraform.git'
                
            }
        }
        stage('Install Terraform') {
              steps {
-                   sh "sudo yum install wget zip -y"
-                   sh "cd /tmp"
-                   sh "curl -o terraform.zip https://releases.hashicorp.com/terraform/'$terraform_version'/terraform_'$terraform_version'_linux_amd64.zip"
-                   sh "unzip terraform.zip"
-                   sh "sudo mv terraform /usr/bin"
-                   sh "rm -rf terraform.zip"
-                   sh "terraform version"
+                   sh "sudo yum install wget unzip -y"
+                   sh "sudo yum install wget -y"
+                   sh "wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip"
+                   sh "sudo unzip ./terraform_0.12.24_linux_amd64.zip -d /usr/local/bin/"
+                   sh "terraform -v"
              }
        }
        stage('terraform init') {
@@ -74,5 +70,3 @@
                    """
            }
        }
-   }
-}
