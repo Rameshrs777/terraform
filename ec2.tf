@@ -1,9 +1,33 @@
 provider "aws" {
-  access_key = "AKIAVWCRJNBRPTZTS75J"
-  secret_key = "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"
-  region     = "us-east-1"
+  region = "eu-west-1"
+  access_key = "${var.access_key}"
+  secret_key = "${var.secret_key}"
 }
-resource "aws_instance" "example"{
-  ami           = "ami-0c322300a1dd5dc79"
-  instance_type = "t2.micro"
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-*"]
   }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["391012509794"]
+}
+
+resource "aws_instance" "exampleweb" {
+  ami           = "${data.aws_ami.ubuntu.id}"
+  instance_type = "t2.micro"
+
+  tags {
+    Name = "HelloWorld"
+  }
+}
+output "ip"{
+value= "${aws_instance.web.public_ip}"
+}
