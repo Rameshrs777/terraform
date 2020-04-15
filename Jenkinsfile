@@ -1,9 +1,8 @@
  pipeline {
-    agent {
-        node {
-            label 'master'
-        }
-     }
+   agent any
+   environment {
+       terraform_version = '0.12.24'
+       
    }
    stages {
        stage('terrform version') {
@@ -76,3 +75,4 @@
            }
        }
    }
+}
